@@ -1,0 +1,6 @@
+Menu.c:16:6:Menu_system_control	24	static
+Menu.c:33:6:Mainmenu	16	static
+Menu.c:83:6:PID_menu	24	static
+Menu.c:127:6:Speed_menu	16	static
+Menu.c:156:6:Color_Studying_process	16	static
+Menu.c:175:6:executeAction	16	static

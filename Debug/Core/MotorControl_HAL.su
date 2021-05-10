@@ -1,0 +1,6 @@
+MotorControl_HAL.c:9:6:MotorL_EnablePWM	8	static
+MotorControl_HAL.c:13:6:MotorL_DisablePWM	8	static
+MotorControl_HAL.c:17:6:MotorR_EnablePWM	8	static
+MotorControl_HAL.c:21:6:MotorR_DisablePWM	8	static
+MotorControl_HAL.c:25:6:MotorL_SetPWM	16	static
+MotorControl_HAL.c:46:6:MotorR_SetPWM	16	static
