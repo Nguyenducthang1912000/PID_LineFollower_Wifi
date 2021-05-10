@@ -32,7 +32,13 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdio.h"
+#include "string.h"
+#include "HAL_I2C_LCD.h"
+#include "HAL_MOTOR_CONTROL.h"
+#include "PID.h"
+#include "DISPLAY_MENU.h"
+#include "FLASH_SECTOR.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

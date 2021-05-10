@@ -16,16 +16,16 @@ extern uint8_t Kp_modify_flag,Ki_modify_flag,Kd_modify_flag ;
 extern uint8_t Left_modify_flag,Right_modify_flag;
 extern uint8_t cancer_menu;
 extern uint8_t cancer_running;
-float Kp,Ki,Kd;
-char kp_str[10],ki_str[10],kd_str[10];
-char Left_str[15],Right_str[15];
+extern float Kp,Ki,Kd;
+char kp_str[12],ki_str[12],kd_str[12];
+char Left_str[20],Right_str[20];
 uint8_t menu_display = 1;
 uint8_t Menu_type = 1;
 uint8_t Run_flag = 0;
 uint8_t line = 1;
-uint16_t Left,Right;
-uint16_t Sensor_Threshold[6];
-uint16_t Sensor_ADC_Value[6];
+extern uint16_t Left,Right;
+extern uint16_t Sensor_Threshold[6];
+extern uint16_t Sensor_ADC_Value[6];
 void Menu_system_control(uint8_t Menu_type,uint8_t line)
 {
 	switch(Menu_type){
@@ -108,7 +108,7 @@ void PID_menu(uint8_t line){
 
 	switch(line){
 	case 1:
-		sprintf(kp_str,">Kp = %1.2f",Kp);
+		sprintf(kp_str,">Kp = %1.2f",(float)Kp);
 		lcd_send_cmd (0x80|0x00);
 		lcd_send_string(kp_str);
 		sprintf(ki_str," Ki = %1.2f",Ki);

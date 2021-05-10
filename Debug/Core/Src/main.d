@@ -32,7 +32,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/HAL_I2C_LCD.h ../Core/Inc/main.h \
- ../Core/Inc/HAL_MOTOR_CONTROL.h
+ ../Core/Inc/HAL_MOTOR_CONTROL.h ../Core/Inc/PID.h \
+ ../Core/Inc/DISPLAY_MENU.h ../Core/Inc/FLASH_SECTOR.h
 
 ../Core/Inc/main.h:
 
@@ -105,3 +106,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/main.h:
 
 ../Core/Inc/HAL_MOTOR_CONTROL.h:
+
+../Core/Inc/PID.h:
+
+../Core/Inc/DISPLAY_MENU.h:
+
+../Core/Inc/FLASH_SECTOR.h:

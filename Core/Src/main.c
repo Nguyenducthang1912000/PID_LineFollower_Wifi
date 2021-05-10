@@ -1,30 +1,28 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
-#include "HAL_I2C_LCD.h"
-#include "HAL_MOTOR_CONTROL.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,17 +66,17 @@ UART_HandleTypeDef huart6;
 extern uint8_t menu_display;
 extern uint8_t Menu_type;
 extern uint8_t line;
-extern uint16_t Sensor_Threshold[] = {2100,2100,2100,2100,2100,2100};
-extern uint16_t Left = 0,Right = 0;
-extern uint16_t Sensor_ADC_Value[5];
-extern float Kp = 0,Ki = 0,Kd = 0;
 
 uint8_t LineDetect = 0;
 uint8_t stateBTNC = 1;
 uint8_t cancer_menu = 1;
 uint8_t cancer_running = 1;
-uint8_t Kp_modify_flag = 0,Ki_modify_flag = 0,Kd_modify_flag = 0;
-uint8_t Left_modify_flag = 0,Right_modify_flag = 0;
+uint8_t Kp_modify_flag = 0, Ki_modify_flag = 0, Kd_modify_flag = 0;
+uint8_t Left_modify_flag = 0, Right_modify_flag = 0;
+uint16_t Sensor_Threshold[] = { 2100, 2100, 2100, 2100, 2100, 2100 };
+uint16_t Sensor_ADC_Value[6];
+uint16_t Left = 0, Right = 0;
+float Kp = 0, Ki = 0, Kd = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,16 +91,18 @@ static void MX_TIM4_Init(void);
 static void MX_I2C3_Init(void);
 static void MX_TIM5_Init(void);
 /* USER CODE BEGIN PFP */
-
+static void SelectItem(void);
+static void Sensor_Convert_A2D(void);
+static void MultifunctionButton(void);
+static void ScrollUp(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-PUTCHAR_PROTOTYPE
-{
- /* Place your implementation of fputc here */
- /* e.g. write a character to the USART2 and Loop until the end of transmission */
-	HAL_UART_Transmit(&huart6, (uint8_t *)&ch, 1, 0xFFFF);
+PUTCHAR_PROTOTYPE {
+	/* Place your implementation of fputc here */
+	/* e.g. write a character to the USART2 and Loop until the end of transmission */
+	HAL_UART_Transmit(&huart6, (uint8_t*) &ch, 1, 0xFFFF);
 	return ch;
 }
 /* USER CODE END 0 */
@@ -144,29 +144,29 @@ int main(void)
   MX_I2C3_Init();
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
-  lcd_init();
-  MotorL_EnablePWM();
-  MotorR_EnablePWM();
-  HAL_ADC_Start_DMA(&hadc1, Sensor_ADC_Value, 6);
+	lcd_init();
+	MotorL_EnablePWM();
+	MotorR_EnablePWM();
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) &Sensor_ADC_Value, 6);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	  while(1){
-  lcd_clear();
-  while (menu_display)
-  {
-	  Menu_system_control(Menu_type, line);
-	  ScrollUp();
-	  SelectItem();
-  }
+	while (1) {
+		lcd_clear();
+		while (menu_display) {
+			Menu_system_control(Menu_type, line);
+			ScrollUp();
+			SelectItem();
+		}
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
-  }
 }
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -643,197 +643,216 @@ static void MX_GPIO_Init(void)
 void Sensor_Convert_A2D()
 {
 	LineDetect = 0;
-	for(int i = 0;i<6;++i)
+	for (int i = 0; i < 6; ++i)
 	{
-		if(Sensor_ADC_Value[i]>Sensor_Threshold[i])
+		if (Sensor_ADC_Value[i] > Sensor_Threshold[i])
 		{
-			sbi(LineDetect,(7-i));
+			sbi(LineDetect, (7 - i));
 //			printf("1 ");
 		}
 		else
 		{
 //			printf("0 ");
 		}
-	};
+	}
 //	printf("\n");
 //	HAL_Delay(100);
 }
 void Sensor_PrintValue(void)
 {
 	printf("Sensor Val: ");
-  for(int i = 0; i < 6; ++i)
-  {
-	  printf("%u ", Sensor_ADC_Value[i]);
-  };
-  printf("\n");
+	for (int i = 0; i < 6; ++i)
+	{
+		printf("%u ", Sensor_ADC_Value[i]);
+	}
+	printf("\n");
 
 }
-void ScrollUp (void)
+void ScrollUp(void)
 {
-	  if(HAL_GPIO_ReadPin(ButtonA_GPIO_Port, ButtonA_Pin)==0)
-	  {
-		  while(HAL_GPIO_ReadPin(ButtonA_GPIO_Port, ButtonA_Pin)==0) HAL_Delay(50);
-		  switch(Menu_type){
-		  case Main_menu:
-			  line--;
-			  if(line<Number_of_Menu_firstline){
-				  line=Maximum_Menu_line;
-			  }
-			  break;
-		  case PID_Menu:
-			  line--;
-			  if(line<Number_of_Menu_firstline){
-				  line=Maximum_Menu_line-1;
-			  }
-			  if(Kp_modify_flag == 1)
-			  {
-				  Kp += 0.2;
-				  line = 1;
-			  }
-			  if(Ki_modify_flag == 1)
-			  {
-				  Ki += 0.2;
-				  line = 2;
-			  }
-			  if(Kd_modify_flag == 1)
-			  {
-				  Kd += 0.2;
-				  line = 3;
-			  }
-			  Menu_system_control(PID_Menu, line);
-			  break;
-		  case Engine_menu:
-			  line--;
-			  if(line<Number_of_Menu_firstline){
-				  line=Maximum_Menu_line-2;
-			  }
-			  if(Left_modify_flag == 1)
-			  {
-				  Left += 100;
-				  line = 1;
-				  if(Left >= 7200)
-				  {
-					  Left = 7200;
-				  }
-			  }
-			  if(Right_modify_flag == 1)
-			  {
-				  Right += 100;
-				  line = 2;
-				  if(Right >= 7200)
-				  {
-					  Right = 7200;
-				  }
-			  }
-			  break;
-		  }
-	  }
+	if (HAL_GPIO_ReadPin(ButtonA_GPIO_Port, ButtonA_Pin) == 0)
+	{
+		while (HAL_GPIO_ReadPin(ButtonA_GPIO_Port, ButtonA_Pin) == 0)
+		{
+			HAL_Delay(50);
+		}
+		switch (Menu_type)
+		{
+		case Main_menu:
+			line--;
+			if (line < Number_of_Menu_firstline)
+			{
+				line = Maximum_Menu_line;
+			}
+			break;
+		case PID_Menu:
+			line--;
+			if (line < Number_of_Menu_firstline)
+			{
+				line = Maximum_Menu_line - 1;
+			}
+			if (Kp_modify_flag == 1)
+			{
+				Kp += 0.2;
+				line = 1;
+			}
+			if (Ki_modify_flag == 1)
+			{
+				Ki += 0.2;
+				line = 2;
+			}
+			if (Kd_modify_flag == 1)
+			{
+				Kd += 0.2;
+				line = 3;
+			}
+			Menu_system_control(PID_Menu, line);
+			break;
+		case Engine_menu:
+			line--;
+			if (line < Number_of_Menu_firstline)
+			{
+				line = Maximum_Menu_line - 2;
+			}
+			if (Left_modify_flag == 1)
+			{
+				Left += 100;
+				line = 1;
+				if (Left >= 7200)
+				{
+					Left = 7200;
+				}
+			}
+			if (Right_modify_flag == 1)
+			{
+				Right += 100;
+				line = 2;
+				if (Right >= 7200)
+				{
+					Right = 7200;
+				}
+			}
+			break;
+		}
+	}
 }
-void SelectItem (void)
+void SelectItem(void)
 {
-	  if(HAL_GPIO_ReadPin(ButtonB_GPIO_Port, ButtonB_Pin)==0)//Select button
-	  {
-		  while(HAL_GPIO_ReadPin(ButtonB_GPIO_Port, ButtonB_Pin)==0) HAL_Delay(50);
-		  executeAction(line);
-		  if(Kp_modify_flag==1 || Ki_modify_flag==1 || Kd_modify_flag==1 || Right_modify_flag == 1 || Left_modify_flag == 1){
-		  }
-		  else{
-			  line = 1;
-		  }
-	  }
+	if (HAL_GPIO_ReadPin(ButtonB_GPIO_Port, ButtonB_Pin) == 0) //Select button
+	{
+		while (HAL_GPIO_ReadPin(ButtonB_GPIO_Port, ButtonB_Pin) == 0)
+		{
+			HAL_Delay(50);
+		}
+		executeAction(line);
+		if (Kp_modify_flag == 1 || Ki_modify_flag == 1 || Kd_modify_flag == 1
+				|| Right_modify_flag == 1 || Left_modify_flag == 1)
+		{
+			__NOP();
+		}
+		else
+		{
+			line = 1;
+		}
+	}
 }
-void MultifunctionButton (void)
+void MultifunctionButton(void)
 {
-	switch(Menu_type){
+	switch (Menu_type)
+	{
 	case Running_menu:
-			Menu_type = Main_menu;
-			line = 1;
-			cancer_running = 0;
-			break;
+		Menu_type = Main_menu;
+		line = 1;
+		cancer_running = 0;
+		break;
 	case Main_menu:
-		  line++;
-		  if(line>Maximum_Menu_line)
-		  {
-			  line=Number_of_Menu_firstline;
-		  }
-		  Menu_system_control(Menu_type, line);
-		  break;
+		line++;
+		if (line > Maximum_Menu_line)
+		{
+			line = Number_of_Menu_firstline;
+		}
+		Menu_system_control(Menu_type, line);
+		break;
 	case PID_Menu:
-		  line++;
-		  if(line>Maximum_Menu_line-1)
-		  {
-			  line=Number_of_Menu_firstline;
-		  }
-		  if(Kp_modify_flag == 1)
-		  {
-			  Kp -= 0.2;
-			  line = 1;
-			  if(Kp <= 0 )
-				  Kp = 0;
-		  }
-		  if(Ki_modify_flag == 1)
-		  {
-			  Ki -= 0.2;
-			  line = 2;
-			  if(Ki <= 0 )
-				  Ki = 0;
-		  }
-		  if(Kd_modify_flag == 1)
-		  {
-			  Kd -= 0.2;
-			  line = 3;
-			  if(Kd <= 0)
-				  Kd = 0;
-		  }
-		  Menu_system_control(Menu_type, line);
-		  break;
-	case Engine_menu:
-		  line++;
-		  if(line>Maximum_Menu_line-2)
-		  {
-			  line=Number_of_Menu_firstline;
-		  }
-		  if(Left_modify_flag == 1)
-		  {
-			  Left -= 100;
-			  line = 1;
-			  if(Left <= 0 )
-				  Left = 0;
-		  }
-		  if(Right_modify_flag == 1)
-		  {
-			  Right -= 100;
-			  line = 2;
-			  if(Right <= 0 )
-				  Right = 0;
-		  }
-		  Menu_system_control(Menu_type, line);
-		  break;
-	case LineDetect_Show:
-			Menu_type = Main_menu;
+		line++;
+		if (line > Maximum_Menu_line - 1)
+		{
+			line = Number_of_Menu_firstline;
+		}
+		if (Kp_modify_flag == 1)
+		{
+			Kp -= 0.2;
 			line = 1;
-			cancer_menu = 0;
-			break;
+			if (Kp <= 0)
+				{Kp = 0;}
+		}
+		if (Ki_modify_flag == 1)
+		{
+			Ki -= 0.2;
+			line = 2;
+			if (Ki <= 0)
+				{Ki = 0;}
+		}
+		if (Kd_modify_flag == 1)
+		{
+			Kd -= 0.2;
+			line = 3;
+			if (Kd <= 0)
+				{Kd = 0;}
+		}
+		Menu_system_control(Menu_type, line);
+		break;
+	case Engine_menu:
+		line++;
+		if (line > Maximum_Menu_line - 2)
+		{
+			line = Number_of_Menu_firstline;
+		}
+		if (Left_modify_flag == 1)
+		{
+			Left -= 100;
+			line = 1;
+			if (Left <= 0)
+				{Left = 0;}
+		}
+		if (Right_modify_flag == 1)
+		{
+			Right -= 100;
+			line = 2;
+			if (Right <= 0)
+				{Right = 0;}
+		}
+		Menu_system_control(Menu_type, line);
+		break;
+	case LineDetect_Show:
+		Menu_type = Main_menu;
+		line = 1;
+		cancer_menu = 0;
+		break;
+	}
 }
-}
-
 
 //Deboucing button program
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if(GPIO_Pin == ButtonC_Pin && stateBTNC == 1){
-			HAL_TIM_Base_Start_IT(&htim5);
-			stateBTNC = 0;
-		}
+	if (GPIO_Pin == ButtonC_Pin && stateBTNC == 1)
+	{
+		HAL_TIM_Base_Start_IT(&htim5);
+		stateBTNC = 0;
+	}
 
-	else{
-			__NOP();
-		}
+	else
+	{
+		__NOP();
+	}
 }
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	if(htim->Instance == htim5.Instance){
-		if(HAL_GPIO_ReadPin(ButtonC_GPIO_Port, ButtonC_Pin) == GPIO_PIN_RESET){
+	if (htim->Instance == htim5.Instance)
+	{
+		if (HAL_GPIO_ReadPin(ButtonC_GPIO_Port, ButtonC_Pin)
+				== GPIO_PIN_RESET)
+		{
 			MultifunctionButton();
 			menu_display = 1;
 			stateBTNC = 1;
@@ -851,11 +870,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-//  while (1)
-//  {
-//  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 
