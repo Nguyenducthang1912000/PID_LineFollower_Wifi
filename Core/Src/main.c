@@ -33,7 +33,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define Number_of_Menu_firstline 1
-#define Maximum_Menu_line 5
+#define Maximum_Menu_line 6
+#define Maximum_PID_line 4
+#define Maximum_Engine_line 3
 #define Running_menu 0
 #define Main_menu 1
 #define Color_Processing 2
@@ -73,10 +75,16 @@ uint8_t cancer_menu = 1;
 uint8_t cancer_running = 1;
 uint8_t Kp_modify_flag = 0, Ki_modify_flag = 0, Kd_modify_flag = 0;
 uint8_t Left_modify_flag = 0, Right_modify_flag = 0;
+uint8_t Data_Read_Flag = 1;
 uint16_t Sensor_Threshold[] = { 2100, 2100, 2100, 2100, 2100, 2100 };
 uint16_t Sensor_ADC_Value[6];
 uint16_t Left = 0, Right = 0;
 float Kp = 0, Ki = 0, Kd = 0;
+char string_2[1];
+char PID_Rx[12];
+char kp_Rx[5],ki_Rx[5],kd_Rx[5];
+char kp_val[10], ki_val[10], kd_val[10];
+char PID_Kp;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -95,6 +103,7 @@ static void SelectItem(void);
 static void Sensor_Convert_A2D(void);
 static void MultifunctionButton(void);
 static void ScrollUp(void);
+static void ReadFlash(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -154,11 +163,14 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
+		ReadFlash();
 		lcd_clear();
+		HAL_Delay(500);
 		while (menu_display) {
 			Menu_system_control(Menu_type, line);
 			ScrollUp();
 			SelectItem();
+
 		}
 	}
     /* USER CODE END WHILE */
@@ -689,7 +701,7 @@ void ScrollUp(void)
 			line--;
 			if (line < Number_of_Menu_firstline)
 			{
-				line = Maximum_Menu_line - 1;
+				line = Maximum_PID_line;
 			}
 			if (Kp_modify_flag == 1)
 			{
@@ -712,7 +724,7 @@ void ScrollUp(void)
 			line--;
 			if (line < Number_of_Menu_firstline)
 			{
-				line = Maximum_Menu_line - 2;
+				line = Maximum_Engine_line;
 			}
 			if (Left_modify_flag == 1)
 			{
@@ -775,7 +787,7 @@ void MultifunctionButton(void)
 		break;
 	case PID_Menu:
 		line++;
-		if (line > Maximum_Menu_line - 1)
+		if (line > Maximum_PID_line)
 		{
 			line = Number_of_Menu_firstline;
 		}
@@ -804,7 +816,7 @@ void MultifunctionButton(void)
 		break;
 	case Engine_menu:
 		line++;
-		if (line > Maximum_Menu_line - 2)
+		if (line > Maximum_Engine_line)
 		{
 			line = Number_of_Menu_firstline;
 		}
@@ -860,6 +872,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 		}
 	}
+}
+void ReadFlash(void)
+{
+	Flash_Read_Data(0x08020000, PID_Rx);
+	Convert_To_Str(PID_Rx, string_2);
+	char *KpinString = strtok(string_2," ");
+	char *KiinString = strtok(NULL," ");
+	char *KdinString = strtok(NULL," ");
+	Kp = strtod(KpinString, NULL);
+	Ki = strtod(KiinString, NULL);
+	Kd = strtod(KdinString, NULL);
+
 }
 /* USER CODE END 4 */
 

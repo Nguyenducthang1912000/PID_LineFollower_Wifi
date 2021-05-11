@@ -7,6 +7,7 @@
 #include "main.h"
 #include "HAL_I2C_LCD.h"
 #include "stdio.h"
+#include "string.h"
 void Mainmenu(uint8_t line);
 void PID_menu(uint8_t line);
 void Speed_menu(uint8_t line);
