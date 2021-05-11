@@ -19,15 +19,15 @@ extern uint8_t cancer_running;
 extern float Kp, Ki, Kd;
 extern char kp_Rx[5],ki_Rx[5],kd_Rx[5];
 char kp_val[5], ki_val[5], kd_val[5];
-char Left_val[5],Right_val[5];
 char kp_str[20], ki_str[20], kd_str[20];
-char string[12],string_engine[12];
+char string[12],string_eng[12];
 char Left_str[20], Right_str[20];
+char Left_val[5], Right_val[5];
 uint8_t menu_display = 1;
 uint8_t Menu_type = 1;
 uint8_t Run_flag = 0;
 uint8_t line = 1;
-extern uint16_t Left, Right;
+extern int16_t Left, Right;
 extern uint16_t Sensor_Threshold[6];
 extern uint16_t Sensor_ADC_Value[6];
 void Menu_system_control(uint8_t Menu_type, uint8_t line) {
@@ -176,30 +176,30 @@ void PID_menu(uint8_t line) {
 void Speed_menu(uint8_t line) {
 	switch (line) {
 	case 1:
-		sprintf(Left_str, ">Left Engine = %u", Left);
+		sprintf(Left_str, ">Left Eng = %d", Left);
 		lcd_send_cmd(0x80 | 0x00);
 		lcd_send_string(Left_str);
-		sprintf(Right_str, " Right Engine = %u", Right);
+		sprintf(Right_str, " Right Eng = %d", Right);
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(Right_str);
 		lcd_send_cmd(0x80 | 0x14);
 		lcd_send_string(" Return to main menu");
 		break;
 	case 2:
-		sprintf(Left_str, " Left Engine = %u", Left);
+		sprintf(Left_str, " Left Eng = %d", Left);
 		lcd_send_cmd(0x80 | 0x00);
 		lcd_send_string(Left_str);
-		sprintf(Right_str, ">Right Engine = %u", Right);
+		sprintf(Right_str, ">Right Eng = %d", Right);
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(Right_str);
 		lcd_send_cmd(0x80 | 0x14);
 		lcd_send_string(" Return to main menu");
 		break;
 	case 3:
-		sprintf(Left_str, " Left Engine = %u", Left);
+		sprintf(Left_str, " Left Eng = %d", Left);
 		lcd_send_cmd(0x80 | 0x00);
 		lcd_send_string(Left_str);
-		sprintf(Right_str, " Right Engine = %u", Right);
+		sprintf(Right_str, " Right Eng = %d", Right);
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(Right_str);
 		lcd_send_cmd(0x80 | 0x14);
@@ -304,9 +304,9 @@ void Saving_Process(void)
 		strcat(string,ki_val);
 		sprintf(kd_val,"%1.2f ",Kd);
 		strcat(string,kd_val);
-//		sprintf(Left_val, "%u ", Left);
+//		sprintf(Left_val,"%d ",Left);
 //		strcat(string,Left_val);
-//		sprintf(Right_val,"%u ",Right);
+//		sprintf(Right_val,"%d ",Right);
 //		strcat(string,Right_val);
 		Flash_Write_Data(0x08020000, string);
 		HAL_NVIC_SystemReset();

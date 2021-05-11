@@ -78,7 +78,7 @@ uint8_t Left_modify_flag = 0, Right_modify_flag = 0;
 uint8_t Data_Read_Flag = 1;
 uint16_t Sensor_Threshold[] = { 2100, 2100, 2100, 2100, 2100, 2100 };
 uint16_t Sensor_ADC_Value[6];
-uint16_t Left = 0, Right = 0;
+int16_t Left = 0, Right = 0;
 float Kp = 0, Ki = 0, Kd = 0;
 char string_2[1];
 char PID_Rx[12];
@@ -824,15 +824,15 @@ void MultifunctionButton(void)
 		{
 			Left -= 100;
 			line = 1;
-			if (Left <= 0)
-				{Left = 0;}
+			if (Left <= -7200)
+				{Left = -7200;}
 		}
 		if (Right_modify_flag == 1)
 		{
 			Right -= 100;
 			line = 2;
-			if (Right <= 0)
-				{Right = 0;}
+			if (Right <= -7200)
+				{Right = -7200;}
 		}
 		Menu_system_control(Menu_type, line);
 		break;
