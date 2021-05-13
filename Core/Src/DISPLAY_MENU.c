@@ -12,6 +12,7 @@
 #define PID_Menu 3
 #define Engine_menu 4
 #define LineDetect_Show 5
+#define Wifi_connect 6
 extern uint8_t Kp_modify_flag, Ki_modify_flag, Kd_modify_flag;
 extern uint8_t Left_modify_flag, Right_modify_flag;
 extern uint8_t cancer_menu;
@@ -35,20 +36,23 @@ void Menu_system_control(uint8_t Menu_type, uint8_t line) {
 	case 0:
 		Running();
 		break;
-	case 1:
+	case Main_menu:
 		Mainmenu(line);
 		break;
-	case 2:
+	case Color_Processing:
 		Color_Studying_process();
 		break;
-	case 3:
+	case PID_Menu:
 		PID_menu(line);
 		break;
-	case 4:
+	case Engine_menu:
 		Speed_menu(line);
 		break;
-	case 5:
+	case LineDetect_Show:
 		LineDetect_show();
+		break;
+	case Wifi_connect:
+		Wifi_Connect_establish();
 		break;
 	}
 }
@@ -100,7 +104,7 @@ void Mainmenu(uint8_t line) {
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(" Save system value  ");
 		lcd_send_cmd(0x80 | 0x14);
-		lcd_send_string("                    ");
+		lcd_send_string(" Wifi Connect       ");
 		lcd_send_cmd(0x80 | 0x54);
 		lcd_send_string("                    ");
 		break;
@@ -110,7 +114,17 @@ void Mainmenu(uint8_t line) {
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(">Save system value  ");
 		lcd_send_cmd(0x80 | 0x14);
+		lcd_send_string(" Wifi Connect       ");
+		lcd_send_cmd(0x80 | 0x54);
 		lcd_send_string("                    ");
+		break;
+	case 7:
+		lcd_send_cmd(0x80 | 0x00);
+		lcd_send_string(" Line Detect show   ");
+		lcd_send_cmd(0x80 | 0x40);
+		lcd_send_string(" Save system value  ");
+		lcd_send_cmd(0x80 | 0x14);
+		lcd_send_string(">Wifi Connect       ");
 		lcd_send_cmd(0x80 | 0x54);
 		lcd_send_string("                    ");
 		break;
@@ -311,6 +325,27 @@ void Saving_Process(void)
 		Flash_Write_Data(0x08020000, string);
 		HAL_NVIC_SystemReset();
 }
+void Wifi_Connect_establish(void)
+{
+		for (int i = 0; i < 5; i++) {
+			lcd_send_cmd(0x80 | 0x00);
+			lcd_send_string("Connecting .       ");
+			HAL_Delay(500);
+			lcd_send_cmd(0x80 | 0x00);
+			lcd_send_string("Connecting . .     ");
+			HAL_Delay(500);
+			lcd_send_cmd(0x80 | 0x00);
+			lcd_send_string("Connecting . . .   ");
+			HAL_Delay(500);
+			lcd_clear();
+		}
+		HAL_Delay(100);
+		lcd_send_cmd(0x80 | 0x00);
+		lcd_send_string("Done               ");
+		HAL_Delay(500);
+		Menu_type = Main_menu;
+		lcd_clear();
+}
 void executeAction(uint8_t line) {
 	switch (line) {
 	case 1:
@@ -406,6 +441,10 @@ void executeAction(uint8_t line) {
 	case 6:
 		Saving_Process();
 		Menu_type = Main_menu;
+		break;
+	case 7:
+		Menu_type = Wifi_connect;
+		lcd_clear();
 		break;
 	}
 

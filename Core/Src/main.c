@@ -33,7 +33,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define Number_of_Menu_firstline 1
-#define Maximum_Menu_line 6
+#define Maximum_Menu_line 7
 #define Maximum_PID_line 4
 #define Maximum_Engine_line 3
 #define Running_menu 0
@@ -42,6 +42,11 @@
 #define PID_Menu 3
 #define Engine_menu 4
 #define LineDetect_Show 5
+#define Wifi_Connect 6
+#define Saving_Process 7
+#define Kp_amount 0.1f
+#define Ki_amount 0.1f
+#define Kd_amount 0.1f
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -78,7 +83,7 @@ uint8_t Left_modify_flag = 0, Right_modify_flag = 0;
 uint8_t Data_Read_Flag = 1;
 uint16_t Sensor_Threshold[] = { 2100, 2100, 2100, 2100, 2100, 2100 };
 uint16_t Sensor_ADC_Value[6];
-int16_t Left = 0, Right = 0;
+int16_t Left = 7200, Right = 7200;
 float Kp = 0, Ki = 0, Kd = 0;
 char string_2[1];
 char PID_Rx[12];
@@ -165,7 +170,6 @@ int main(void)
 	while (1) {
 		ReadFlash();
 		lcd_clear();
-		HAL_Delay(500);
 		while (menu_display) {
 			Menu_system_control(Menu_type, line);
 			ScrollUp();
@@ -705,17 +709,17 @@ void ScrollUp(void)
 			}
 			if (Kp_modify_flag == 1)
 			{
-				Kp += 0.2;
+				Kp += Kp_amount;
 				line = 1;
 			}
 			if (Ki_modify_flag == 1)
 			{
-				Ki += 0.2;
+				Ki += Ki_amount;
 				line = 2;
 			}
 			if (Kd_modify_flag == 1)
 			{
-				Kd += 0.2;
+				Kd += Kd_amount;
 				line = 3;
 			}
 			Menu_system_control(PID_Menu, line);
@@ -793,21 +797,21 @@ void MultifunctionButton(void)
 		}
 		if (Kp_modify_flag == 1)
 		{
-			Kp -= 0.2;
+			Kp -= Kp_amount;
 			line = 1;
 			if (Kp <= 0)
 				{Kp = 0;}
 		}
 		if (Ki_modify_flag == 1)
 		{
-			Ki -= 0.2;
+			Ki -= Ki_amount;
 			line = 2;
 			if (Ki <= 0)
 				{Ki = 0;}
 		}
 		if (Kd_modify_flag == 1)
 		{
-			Kd -= 0.2;
+			Kd -= Kd_amount;
 			line = 3;
 			if (Kd <= 0)
 				{Kd = 0;}
