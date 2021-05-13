@@ -32,21 +32,25 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define Number_of_Menu_firstline 1
-#define Maximum_Menu_line 7
-#define Maximum_PID_line 4
-#define Maximum_Engine_line 3
-#define Running_menu 0
-#define Main_menu 1
-#define Color_Processing 2
-#define PID_Menu 3
-#define Engine_menu 4
-#define LineDetect_Show 5
-#define Wifi_Connect 6
-#define Saving_Process 7
-#define Kp_amount 0.1f
-#define Ki_amount 0.1f
-#define Kd_amount 0.1f
+#define Number_of_Menu_firstline 		1
+#define Maximum_Menu_line 				7
+#define Maximum_PID_line 				4
+#define Maximum_Engine_line 			3
+
+/* Menu Types definition -----------------------------------------------------*/
+#define Running_menu 					0
+#define Main_menu 						1
+#define Color_Processing 				2
+#define PID_Menu 						3
+#define Engine_menu 					4
+#define LineDetect_Show 				5
+#define Wifi_Connect 					6
+#define Saving_Process 					7
+
+/* Increase or Decrease amount for PID ---------------------------------------*/
+#define Kp_amount 					 0.1f
+#define Ki_amount 					 0.1f
+#define Kd_amount 					 0.1f
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -80,16 +84,13 @@ uint8_t cancer_menu = 1;
 uint8_t cancer_running = 1;
 uint8_t Kp_modify_flag = 0, Ki_modify_flag = 0, Kd_modify_flag = 0;
 uint8_t Left_modify_flag = 0, Right_modify_flag = 0;
-uint8_t Data_Read_Flag = 1;
+int16_t Left = 7200, Right = 7200;
 uint16_t Sensor_Threshold[] = { 2100, 2100, 2100, 2100, 2100, 2100 };
 uint16_t Sensor_ADC_Value[6];
-int16_t Left = 7200, Right = 7200;
 float Kp = 0, Ki = 0, Kd = 0;
 char string_2[1];
 char PID_Rx[12];
-char kp_Rx[5],ki_Rx[5],kd_Rx[5];
 char kp_val[10], ki_val[10], kd_val[10];
-char PID_Kp;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -158,10 +159,10 @@ int main(void)
   MX_I2C3_Init();
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
-	lcd_init();
-	MotorL_EnablePWM();
-	MotorR_EnablePWM();
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) &Sensor_ADC_Value, 6);
+  lcd_init();
+  MotorL_EnablePWM();
+  MotorR_EnablePWM();
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*) &Sensor_ADC_Value, 6);
 
   /* USER CODE END 2 */
 

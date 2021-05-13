@@ -5,23 +5,30 @@
  *      Author: DucThang
  */
 #include <DISPLAY_MENU.h>
+/* Menu Types definition -----------------------------------------------------*/
+#define Running_Process 				0
+#define Main_menu 						1
+#define Color_Processing 				2
+#define PID_Menu 						3
+#define Engine_menu 					4
+#define LineDetect_Show 				5
+#define Wifi_connect 					6
 
-#define Running_Process 0
-#define Main_menu 1
-#define Color_Processing 2
-#define PID_Menu 3
-#define Engine_menu 4
-#define LineDetect_Show 5
-#define Wifi_connect 6
+/* Value modify flag --------------------------------------------------------*/
 extern uint8_t Kp_modify_flag, Ki_modify_flag, Kd_modify_flag;
 extern uint8_t Left_modify_flag, Right_modify_flag;
+
+/* Exit menu showing process ------------------------------------------------*/
 extern uint8_t cancer_menu;
+
+/* Exit running process -----------------------------------------------------*/
 extern uint8_t cancer_running;
+
+/* System private value -----------------------------------------------------*/
 extern float Kp, Ki, Kd;
-extern char kp_Rx[5],ki_Rx[5],kd_Rx[5];
 char kp_val[5], ki_val[5], kd_val[5];
 char kp_str[20], ki_str[20], kd_str[20];
-char string[12],string_eng[12];
+char string[12];
 char Left_str[20], Right_str[20];
 char Left_val[5], Right_val[5];
 uint8_t menu_display = 1;
@@ -31,6 +38,7 @@ uint8_t line = 1;
 extern int16_t Left, Right;
 extern uint16_t Sensor_Threshold[6];
 extern uint16_t Sensor_ADC_Value[6];
+
 void Menu_system_control(uint8_t Menu_type, uint8_t line) {
 	switch (Menu_type) {
 	case 0:
@@ -134,52 +142,52 @@ void PID_menu(uint8_t line) {
 
 	switch (line) {
 	case 1:
-		sprintf(kp_str, ">Kp = %1.2f", Kp);
+		sprintf(kp_str, ">Kp = %.2f         ", Kp);
 		lcd_send_cmd(0x80 | 0x00);
 		lcd_send_string(kp_str);
-		sprintf(ki_str, " Ki = %1.2f", Ki);
+		sprintf(ki_str, " Ki = %.2f         ", Ki);
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(ki_str);
-		sprintf(kd_str, " Kd = %1.2f", Kd);
+		sprintf(kd_str, " Kd = %.2f         ", Kd);
 		lcd_send_cmd(0x80 | 0x14);
 		lcd_send_string(kd_str);
 		lcd_send_cmd(0x80 | 0x54);
 		lcd_send_string(" Return to main menu");
 		break;
 	case 2:
-		sprintf(kp_str, " Kp = %1.2f", Kp);
+		sprintf(kp_str, " Kp = %.2f         ", Kp);
 		lcd_send_cmd(0x80 | 0x00);
 		lcd_send_string(kp_str);
-		sprintf(ki_str, ">Ki = %1.2f", Ki);
+		sprintf(ki_str, ">Ki = %.2f         ", Ki);
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(ki_str);
-		sprintf(kd_str, " Kd = %1.2f", Kd);
+		sprintf(kd_str, " Kd = %.2f         ", Kd);
 		lcd_send_cmd(0x80 | 0x14);
 		lcd_send_string(kd_str);
 		lcd_send_cmd(0x80 | 0x54);
 		lcd_send_string(" Return to main menu");
 		break;
 	case 3:
-		sprintf(kp_str, " Kp = %1.2f", Kp);
+		sprintf(kp_str, " Kp = %.2f         ", Kp);
 		lcd_send_cmd(0x80 | 0x00);
 		lcd_send_string(kp_str);
-		sprintf(ki_str, " Ki = %1.2f", Ki);
+		sprintf(ki_str, " Ki = %.2f         ", Ki);
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(ki_str);
-		sprintf(kd_str, ">Kd = %1.2f", Kd);
+		sprintf(kd_str, ">Kd = %.2f         ", Kd);
 		lcd_send_cmd(0x80 | 0x14);
 		lcd_send_string(kd_str);
 		lcd_send_cmd(0x80 | 0x54);
 		lcd_send_string(" Return to main menu");
 		break;
 	case 4:
-		sprintf(kp_str, " Kp = %1.2f", Kp);
+		sprintf(kp_str, " Kp = %.2f         ", Kp);
 		lcd_send_cmd(0x80 | 0x00);
 		lcd_send_string(kp_str);
-		sprintf(ki_str, " Ki = %1.2f", Ki);
+		sprintf(ki_str, " Ki = %.2f         ", Ki);
 		lcd_send_cmd(0x80 | 0x40);
 		lcd_send_string(ki_str);
-		sprintf(kd_str, " Kd = %1.2f", Kd);
+		sprintf(kd_str, " Kd = %.2f         ", Kd);
 		lcd_send_cmd(0x80 | 0x14);
 		lcd_send_string(kd_str);
 		lcd_send_cmd(0x80 | 0x54);
@@ -312,16 +320,12 @@ void Running(void) // Activate the car for running
 }
 void Saving_Process(void)
 {
-		sprintf(kp_val,"%1.2f ",Kp);
+		sprintf(kp_val,"%.2f ",Kp);
 		strcat(string,kp_val);
-		sprintf(ki_val,"%1.2f ",Ki);
+		sprintf(ki_val,"%.2f ",Ki);
 		strcat(string,ki_val);
-		sprintf(kd_val,"%1.2f ",Kd);
+		sprintf(kd_val,"%.2f ",Kd);
 		strcat(string,kd_val);
-//		sprintf(Left_val,"%d ",Left);
-//		strcat(string,Left_val);
-//		sprintf(Right_val,"%d ",Right);
-//		strcat(string,Right_val);
 		Flash_Write_Data(0x08020000, string);
 		HAL_NVIC_SystemReset();
 }
@@ -374,6 +378,7 @@ void executeAction(uint8_t line) {
 		}
 		lcd_clear();
 		break;
+
 	case 2:
 		switch (Menu_type) {
 		case Main_menu:
@@ -398,6 +403,7 @@ void executeAction(uint8_t line) {
 		}
 		lcd_clear();
 		break;
+
 	case 3:
 		switch (Menu_type) {
 		case Main_menu:
@@ -418,6 +424,7 @@ void executeAction(uint8_t line) {
 		}
 		lcd_clear();
 		break;
+
 	case 4:
 		switch (Menu_type) {
 		case Main_menu:
@@ -429,6 +436,7 @@ void executeAction(uint8_t line) {
 		}
 		lcd_clear();
 		break;
+
 	case 5:
 		switch (Menu_type) {
 		case Main_menu:
@@ -438,14 +446,15 @@ void executeAction(uint8_t line) {
 		}
 		lcd_clear();
 		break;
+
 	case 6:
 		Saving_Process();
 		Menu_type = Main_menu;
 		break;
+
 	case 7:
 		Menu_type = Wifi_connect;
 		lcd_clear();
 		break;
 	}
-
 }
